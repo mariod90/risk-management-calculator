@@ -64,11 +64,11 @@ export default {
       input: "",
       result: "",
       typeOperation: "",
-      percentMovementCompensation: 2,
+      percentMovementCompensation: 3.17,
       percentCoinsForCompensation: 40,
       moneyStopLoss: 5,
-      entryPrice: 0.2693,
-      quantityCoinsInEntryPrice: 74,
+      entryPrice: 15.5,
+      quantityCoinsInEntryPrice: 0.7,
       showTable: false,
       output: []
     };
@@ -110,13 +110,17 @@ export default {
         } else {
           hitSL = true;
           const percentStopLoss = (sumPercentMovementCompensation * this.moneyStopLoss) / moneyRisk;
+          console.log('percentStopLoss', percentStopLoss);
           const percentSLToAddOrSubs = this.entryPrice * (percentStopLoss/100);
-          let priceStopLoss = this.entryPrice;
+          console.log('percentSLToAddOrSubs', percentSLToAddOrSubs);
+          let priceStopLoss = priceCalculate;
+          console.log('priceStopLoss', priceStopLoss);
           if(this.typeOperation === 'long') {
             priceStopLoss -= percentSLToAddOrSubs;
           } else {
             priceStopLoss += percentSLToAddOrSubs;
           }
+          console.log('priceStopLoss', priceCalculate);
           this.output.push({
             index: `SL(${this.typeOperation === 'long' ? '-' : ''}${percentStopLoss.toFixed(2)}%)`,
             price: priceStopLoss.toFixed(decimals),

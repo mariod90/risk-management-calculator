@@ -1,27 +1,16 @@
 <script setup lang="ts">
-import Calculator from './components/Calculator.vue'
-import CalculatorV2 from "@/components/CalculatorV2.vue";
+import CalculatorV3 from "@/components/CalculatorV3.vue";
 </script>
 
 <template>
   <main>
-    <Calculator />
+    <CalculatorV3 />
   </main>
-
-  <main>
-    <CalculatorV2 />
-  </main>
-
 </template>
 
 <style scoped>
 header {
   line-height: 1.5;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
 }
 
 @media (min-width: 1024px) {

@@ -1,4 +1,5 @@
 <template>
+
   <div class="calculator">
     <div class="item">
       <span>Type operation</span>
@@ -75,11 +76,11 @@ export default {
     return {
       totalCapital: 100,
       typeOperation: "",
-      percentMovementCompensation: 2,
+      percentMovementCompensation: 3.17,
       percentCoinsForCompensation: 40,
       moneyStopLoss: 5,
-      moneyFirstOrder: 1.5,
-      entryPrice: 0.2693,
+      moneyFirstOrder: 2,
+      entryPrice: 15.5,
       quantityCoinsInEntryPrice: 0,
       costUSDByOrder: 0,
       showTable: false,
@@ -126,6 +127,7 @@ export default {
       let counterCompensations = 0;
       while (!hitSL && this.output.length <= (this.quantityOrders + 1)) {
         const moneyRisk = totalUSDT * (sumPercentMovementCompensation / 100);
+        console.log('moneyRisk', moneyRisk);
         if(Math.round(moneyRisk) < this.moneyStopLoss) {
           if(counterCompensations === 0) {
             this.output.push({
