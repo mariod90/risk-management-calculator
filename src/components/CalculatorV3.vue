@@ -3,14 +3,14 @@
     <a-layout class="layout-calculator">
       <a-layout-content>
         <a-row>
-          <a-col :xs="24" :lg="12"> <!-- Calculator -->
+          <a-col :xs="24" :lg="12" class="calculator"> <!-- Calculator -->
 
-            <a-radio-group v-model:value="typeOperation" size="large" button-style="solid" class="radio-group-type-operation">
-              <a-radio-button value="long">LONG</a-radio-button>
-              <a-radio-button value="short">SHORT</a-radio-button>
+            <a-radio-group v-model:value="typeOperation" size="large" button-style="solid" class="radio-group-type-operation" @click="typeOperationSelected = true">
+              <a-radio-button value="long" class="btn-long">LONG</a-radio-button>
+              <a-radio-button value="short" class="btn-short">SHORT</a-radio-button>
             </a-radio-group>
 
-            <a-input-number v-model:value="percentMovementCompensation" size="large" class="input-number-calc">
+            <a-input-number v-model:value="percentMovementCompensation" :disabled="!typeOperationSelected" size="large" class="input-number-calc" placeholder="Distancia de compensación" @change="validateInputs">
               <template #addonBefore>
                 <a-popover title="Porcentaje de compensación" trigger="click">
                   <template #content>
@@ -23,7 +23,7 @@
               </template>
             </a-input-number>
 
-            <a-input-number v-model:value="percentCoinsForCompensation" size="large" class="input-number-calc">
+            <a-input-number v-model:value="percentCoinsForCompensation" :disabled="!typeOperationSelected" size="large" class="input-number-calc" placeholder="Porcentaje de monedas en compensación" @change="validateInputs">
               <template #addonBefore>
                 <a-popover title="Porcentaje de monedas en compensación" trigger="click">
                   <template #content>
@@ -37,7 +37,7 @@
               </template>
             </a-input-number>
 
-            <a-input-number v-model:value="moneyStopLoss" size="large" class="input-number-calc">
+            <a-input-number v-model:value="moneyStopLoss" :disabled="!typeOperationSelected" size="large" class="input-number-calc" placeholder="Cantidad de USDT a arriesgar" @change="validateInputs">
               <template #addonBefore>
                 <a-popover title="Cantidad de USDT a arriesgar" trigger="click">
                   <template #content>
@@ -51,7 +51,7 @@
               </template>
             </a-input-number>
 
-            <a-input-number v-model:value="entryPrice" size="large" class="input-number-calc">
+            <a-input-number v-model:value="entryPrice" :disabled="!typeOperationSelected" size="large" class="input-number-calc" placeholder="Precio de entrada" @change="validateInputs">
               <template #addonBefore>
                 <a-popover title="Precio de entrada" trigger="click">
                   <template #content>
@@ -64,7 +64,7 @@
               </template>
             </a-input-number>
 
-            <a-input-number v-model:value="quantityCoinsInEntryPrice" size="large" class="input-number-calc">
+            <a-input-number v-model:value="quantityCoinsInEntryPrice" :disabled="!typeOperationSelected" size="large" class="input-number-calc" placeholder="Monedas en precio de entrada" @change="validateInputs">
               <template #addonBefore>
                 <a-popover title="Cantidad de monedas iniciales" trigger="click">
                   <template #content>
@@ -77,98 +77,55 @@
               </template>
             </a-input-number>
 
-            <a-button type="primary" size="large" @click="calculate">
+            <a-button type="primary" size="large" @click="calculate" class="button-calc" :disabled="!allInputsFilled">
               <template #icon><CalculatorOutlined /></template>
-              Calcular
+              CALCULAR
             </a-button>
-
-
-<!--            <a-row>
-              <a-col :xs="12" :lg="12">
-                <a-button>LONG</a-button>
-              </a-col>
-              <a-col :xs="12" :lg="12">
-                <a-button>SHORT</a-button>
-              </a-col>
-            </a-row>-->
 
           </a-col> <!-- END Calculator -->
 
           <a-col :sm="24" :md="24" :lg="12"> <!-- Table results -->
 
-            <table class="" v-if="showTable">
-              <thead>
-              <tr>
-                <th>#</th>
-                <th>PRECIO</th>
-                <th>MONEDAS</th>
-                <th>USDT</th>
-              </tr>
-              </thead>
-              <tbody id="salida">
-              <tr v-for="(item, index) in output" :key="index">
-                <td>{{ item.index }}</td>
-                <td>{{ item.price }}</td>
-                <td>{{ item.coins }}</td>
-                <td>{{ item.usdt }}</td>
-              </tr>
-              </tbody>
-            </table>
+            <a-table :columns="columns" :data-source="output" :pagination="false" :scroll="{ x: 450 }" v-if="showTable">
+              <template #bodyCell="{ column, text }">
+                <template v-if="column.dataIndex === 'order'">
+                  <span>{{ text }}</span>
+                </template>
+              </template>
+            </a-table>
 
           </a-col> <!-- END Table results -->
         </a-row>
       </a-layout-content>
     </a-layout>
 
-
-  <div class="calculator">
-
-
-
-<!--    <div class="item">
-      <span>Type operation</span>
-      <select v-model="typeOperation">
-        <option value="long">LONG</option>
-        <option value="short">SHORT</option>
-      </select>
-    </div>-->
-
-<!--    <div class="item">
-      <span>% Movement compensacion</span>
-      <input type="number" v-model="percentMovementCompensation"  />
-    </div>-->
-
-<!--    <div class="item">
-      <span>% Coins for compensation</span>
-      <input type="number" v-model="percentCoinsForCompensation"  />
-    </div>-->
-
-<!--    <div class="item">
-      <span>USD Stop Loss</span>
-      <input type="number" v-model="moneyStopLoss" placeholder="$" />
-    </div>-->
-
-<!--    <div class="item">
-      <span>Entry price</span>
-      <input type="number" v-model="entryPrice"  />
-    </div>-->
-
-<!--    <div class="item">
-      <span>Quantity coin in entry price</span>
-      <input type="number" v-model="quantityCoinsInEntryPrice" />
-    </div>-->
-
-<!--    <button @click="calculate">Calculate</button>-->
-  </div>
-
-
 </template>
 
 <script>
+import { notification } from 'ant-design-vue';
 import PercentageOutlined from "@ant-design/icons-vue/PercentageOutlined";
 import DollarOutlined from "@ant-design/icons-vue/DollarOutlined";
 import NumberOutlined from "@ant-design/icons-vue/NumberOutlined";
 import CalculatorOutlined from "@ant-design/icons-vue/CalculatorOutlined";
+
+const columns = [
+  {
+    title: '#',
+    dataIndex: 'order',
+  },
+  {
+    title: 'PRECIO',
+    dataIndex: 'price',
+  },
+  {
+    title: 'MONEDAS',
+    dataIndex: 'coins',
+  },
+  {
+    title: 'USDT',
+    dataIndex: 'usdt',
+  },
+];
 
 export default {
   name: "CalculatorV3",
@@ -178,91 +135,131 @@ export default {
     NumberOutlined,
     CalculatorOutlined
   },
+  setup() {
+    return {
+      columns
+    };
+  },
   data() {
     return {
       input: "",
       result: "",
       typeOperation: "",
       percentMovementCompensation: 3,
-      percentCoinsForCompensation: 40,
-      moneyStopLoss: 4,
-      entryPrice: 15.5,
-      quantityCoinsInEntryPrice: 0.7,
+      percentCoinsForCompensation: 50,
+      moneyStopLoss: 5,
+      entryPrice: 14,
+      quantityCoinsInEntryPrice: 0.9,
       showTable: false,
+      btnCalcDisabled: true,
+      typeOperationSelected: false,
+      allInputsFilled: false,
       output: []
     };
   },
   methods: {
+    validateInputs() {
+      this.allInputsFilled = typeof this.percentMovementCompensation === "number" &&
+        typeof this.percentCoinsForCompensation === "number" &&
+        typeof this.moneyStopLoss === "number" &&
+        typeof this.entryPrice === "number" &&
+        typeof this.quantityCoinsInEntryPrice === "number";
+    },
     clear() {
       this.output = [];
+      this.showTable = false;
     },
     calculate() {
       this.clear();
       let hitSL = false;
-      let decimals = this.entryPrice.toString().split(".")[1].length;
-      decimals = decimals <= 1 ? decimals + 1 : decimals;
-      let sumUSD = this.entryPrice * this.quantityCoinsInEntryPrice;
-      let quantityCoins = this.quantityCoinsInEntryPrice;
-      let priceToPercentDistance = this.entryPrice;
-      let priceAveraged = this.entryPrice;
-      let sumCoins = quantityCoins;
-      let lastMoneyRisk = -1;
-      let lastPriceToPercentDistance = priceToPercentDistance;
-      while (!hitSL && this.output.length < 10) {
-        let lastPriceAveraged = priceAveraged;
-        if(this.typeOperation === "long") {
-          priceToPercentDistance -= priceToPercentDistance * this.percentMovementCompensation / 100;
-          // calculate price averaged
-          const diffPrices = this.entryPrice - priceToPercentDistance;
-          const valueToAdd = diffPrices * (this.percentCoinsForCompensation / 100);
-          priceAveraged = priceToPercentDistance + valueToAdd;
-        } else {
-          priceToPercentDistance += priceToPercentDistance * this.percentMovementCompensation / 100;
-          // calculate price averaged
-          const diffPrices = priceToPercentDistance - this.entryPrice;
-          const valueToSub = diffPrices * (this.percentCoinsForCompensation / 100);
-          priceAveraged = priceToPercentDistance - valueToSub;
+      let decimals = 0;
+      try{
+        if(!Number.isInteger(this.entryPrice)){
+          decimals = this.entryPrice.toString().split(".")[1].length;
         }
-        quantityCoins += quantityCoins * (this.percentCoinsForCompensation / 100);
-        const quantityUSD = priceToPercentDistance * quantityCoins;
-        sumUSD += quantityUSD;
-
-        let moneyRisk = sumUSD * (((priceAveraged - priceToPercentDistance) * 100) / priceAveraged) / 100;
-        if(this.typeOperation === "short") {
-          moneyRisk *= -1;
-        }
-
-        if (moneyRisk >= this.moneyStopLoss) {
-          hitSL = true;
-          const distanceToMoneyRiskPriceExceeded = (Math.abs(lastPriceAveraged - lastPriceToPercentDistance) * this.moneyStopLoss) / lastMoneyRisk; // 0.806
-          let priceSL = 0;
+        decimals = decimals <= 1 ? decimals + 1 : decimals;
+        let sumUSD = this.entryPrice * this.quantityCoinsInEntryPrice;
+        let quantityCoins = this.quantityCoinsInEntryPrice;
+        let priceToPercentDistance = this.entryPrice;
+        let priceAveraged = this.entryPrice;
+        let sumCoins = quantityCoins;
+        let lastMoneyRisk = -1;
+        let lastPriceToPercentDistance = priceToPercentDistance;
+        while (!hitSL && this.output.length < 10) {
+          let lastPriceAveraged = priceAveraged;
           if(this.typeOperation === "long") {
-            priceSL = lastPriceAveraged - distanceToMoneyRiskPriceExceeded;
+            priceToPercentDistance -= priceToPercentDistance * this.percentMovementCompensation / 100;
+            // calculate price averaged
+            const diffPrices = this.entryPrice - priceToPercentDistance;
+            const valueToAdd = diffPrices * (this.percentCoinsForCompensation / 100);
+            priceAveraged = priceToPercentDistance + valueToAdd;
           } else {
-            priceSL = lastPriceAveraged + distanceToMoneyRiskPriceExceeded;
+            priceToPercentDistance += priceToPercentDistance * this.percentMovementCompensation / 100;
+            // calculate price averaged
+            const diffPrices = priceToPercentDistance - this.entryPrice;
+            const valueToSub = diffPrices * (this.percentCoinsForCompensation / 100);
+            priceAveraged = priceToPercentDistance - valueToSub;
           }
-          let percentToSL = (Math.abs(priceSL - this.entryPrice) * 100) / this.entryPrice;
+          quantityCoins += quantityCoins * (this.percentCoinsForCompensation / 100);
+          const quantityUSD = priceToPercentDistance * quantityCoins;
+          sumUSD += quantityUSD;
 
-          this.output.push({
-            index: `SL(${this.typeOperation === 'long' ? '-' : ''}${percentToSL.toFixed(2)}%)`,
-            price: `$${priceSL.toFixed(decimals)}`,
-            coins: sumCoins.toFixed(3), // ***** OK ***** //
-            usdt: `$${(sumUSD - quantityUSD).toFixed(2)}` // ***** OK ***** //
+          let moneyRisk = sumUSD * (((priceAveraged - priceToPercentDistance) * 100) / priceAveraged) / 100;
+          if(this.typeOperation === "short") {
+            moneyRisk *= -1;
+          }
+
+          if (moneyRisk >= this.moneyStopLoss) {
+            hitSL = true;
+            const distanceToMoneyRiskPriceExceeded = (Math.abs(lastPriceAveraged - lastPriceToPercentDistance) * this.moneyStopLoss) / lastMoneyRisk;
+            let priceSL = 0;
+            if(this.typeOperation === "long") {
+              priceSL = lastPriceAveraged - distanceToMoneyRiskPriceExceeded;
+            } else {
+              priceSL = lastPriceAveraged + distanceToMoneyRiskPriceExceeded;
+            }
+            let percentToSL = (Math.abs(priceSL - this.entryPrice) * 100) / this.entryPrice;
+
+            this.output.push({
+              key: this.output.length + 1,
+              order: `SL(${this.typeOperation === 'long' ? '-' : ''}${percentToSL.toFixed(2)}%)`,
+              price: `$${priceSL.toFixed(decimals)}`,
+              coins: sumCoins.toFixed(3),
+              usdt: `$${(sumUSD - quantityUSD).toFixed(2)}`
+            });
+          }else{
+            lastMoneyRisk = moneyRisk;
+            sumCoins += quantityCoins;
+            lastPriceToPercentDistance = priceToPercentDistance;
+
+            this.output.push({
+              key: this.output.length + 1,
+              order: this.output.length + 1,
+              price: `$${priceToPercentDistance.toFixed(decimals)}`,
+              coins: quantityCoins.toFixed(3),
+              usdt: `$${quantityUSD.toFixed(2)}`
+            });
+          }
+        }
+        if(this.output.length > 0){
+          this.showTable = true;
+          notification['success']({
+            message: 'Exito!',
+            description: 'Se han obtenido los puntos de órdenes exitosamente.'
           });
-        }else{
-          lastMoneyRisk = moneyRisk;
-          sumCoins += quantityCoins;
-          lastPriceToPercentDistance = priceToPercentDistance;
-
-          this.output.push({
-            index: this.output.length + 1,
-            price:  `$${priceToPercentDistance.toFixed(decimals)}`,
-            coins: quantityCoins.toFixed(3),
-            usdt: `$${quantityUSD.toFixed(2)}`
+        } else {
+          notification['warning']({
+            message: 'Revisa tus variables de entrada',
+            description: 'No se han obtenido los puntos de órdenes.'
           });
         }
+      }catch (err) {
+        const error = err.message ?? err;
+        notification['error']({
+          message: 'Ups! Ha ocurrido un error',
+          description: error
+        });
       }
-      this.showTable = this.output.length > 0;
     },
   },
 }
@@ -274,8 +271,17 @@ export default {
   background: transparent;
 }
 
-.radio-group-type-operation {
+.radio-group-type-operation, .button-calc {
   width: 100%;
+}
+.button-calc, .button-calc:active, .button-calc:focus, .button-calc:hover {
+  background: rgb(252, 213, 53);
+  color: rgb(24, 26, 32);
+  border-color: rgb(252, 213, 53);
+}
+
+.button-calc:hover {
+  opacity: 0.8;
 }
 
 .radio-group-type-operation > label {
@@ -292,19 +298,59 @@ export default {
   height: auto;
 }
 
-
-
 .calculator {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  gap: 10px;
+  margin-bottom: 1rem;
 }
-.calculator .item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 10px;
+
+@media (min-width: 992px) {
+  .calculator {
+    padding: 0 1.5rem;
+  }
 }
+
+.btn-long.ant-radio-button-wrapper-checked {
+  background: rgb(14, 203, 129) !important;
+  border-color: rgb(14, 203, 129) !important;
+  font-weight: bold !important;
+}
+
+.btn-long.ant-radio-button-wrapper-checked:hover {
+  color: #fff !important;
+}
+
+.btn-long:hover {
+  color: rgb(14, 203, 129) !important;
+  border-color: rgb(14, 203, 129) !important;
+}
+
+.btn-long:hover + .btn-short::before {
+  background: none !important;
+}
+
+.btn-short.ant-radio-button-wrapper-checked {
+  background: rgb(246, 70, 93) !important;
+  border-color: rgb(246, 70, 93) !important;
+  font-weight: bold !important;
+}
+
+.btn-short.ant-radio-button-wrapper-checked:hover {
+  color: #fff !important;
+}
+
+.btn-short:hover {
+  color: rgb(246, 70, 93) !important;
+  border-color: rgb(246, 70, 93) !important;
+}
+
+.btn-short.ant-radio-button-wrapper-checked::before {
+  background: rgb(246, 70, 93) !important;
+}
+
+.btn-short:hover::before, .btn-short:active::before, .btn-short:focus::before, .btn-short:visited::before, .btn-short:focus-visible::before, .btn-short:focus-within::before {
+  background: rgb(246, 70, 93) !important;
+}
+
 </style>
