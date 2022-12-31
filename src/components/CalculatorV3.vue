@@ -189,26 +189,18 @@ export default {
           let lastPriceAveraged = priceAveraged;
           if(this.typeOperation === "long") {
             priceToPercentDistance -= priceToPercentDistance * this.percentMovementCompensation / 100;
-            // calculate price averaged
-            const diffPrices = this.entryPrice - priceToPercentDistance;
-            const valueToAdd = diffPrices * (this.percentCoinsForCompensation / 100);
-            priceAveraged = priceToPercentDistance + valueToAdd;
           } else {
             priceToPercentDistance += priceToPercentDistance * this.percentMovementCompensation / 100;
-            // calculate price averaged
-            const diffPrices = priceToPercentDistance - this.entryPrice;
-            const valueToSub = diffPrices * (this.percentCoinsForCompensation / 100);
-            priceAveraged = priceToPercentDistance - valueToSub;
           }
           quantityCoins += quantityCoins * (this.percentCoinsForCompensation / 100);
           const quantityUSD = priceToPercentDistance * quantityCoins;
           sumUSD += quantityUSD;
-
+          sumCoins += quantityCoins;
+          priceAveraged = sumUSD / sumCoins;
           let moneyRisk = sumUSD * (((priceAveraged - priceToPercentDistance) * 100) / priceAveraged) / 100;
           if(this.typeOperation === "short") {
             moneyRisk *= -1;
           }
-
           if (moneyRisk >= this.moneyStopLoss) {
             hitSL = true;
             const distanceToMoneyRiskPriceExceeded = (Math.abs(lastPriceAveraged - lastPriceToPercentDistance) * this.moneyStopLoss) / lastMoneyRisk;
@@ -224,14 +216,12 @@ export default {
               key: this.output.length + 1,
               order: `SL(${this.typeOperation === 'long' ? '-' : ''}${percentToSL.toFixed(2)}%)`,
               price: `$${priceSL.toFixed(decimals)}`,
-              coins: sumCoins.toFixed(3),
+              coins: `$${(sumCoins - quantityCoins).toFixed(3)}`,
               usdt: `$${(sumUSD - quantityUSD).toFixed(2)}`
             });
           }else{
             lastMoneyRisk = moneyRisk;
-            sumCoins += quantityCoins;
             lastPriceToPercentDistance = priceToPercentDistance;
-
             this.output.push({
               key: this.output.length + 1,
               order: this.output.length + 1,
